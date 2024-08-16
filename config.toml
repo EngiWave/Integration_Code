@@ -1,0 +1,84 @@
+clear_outputs = true  # true: clears outputs folder from old resualts (recommended). false: will leave outputs folder as is (not recommended)
+
+# Pdm2pcm
+[Pdm2pcm]
+input_path = 'inputs\Counting.txt'  # relative path to input.txt 
+output_path = 'outputs\pdm2pcm_output.wav'  # path to where the output will be saved
+
+
+# Dc remove
+[DC_Remove]
+input_path = 'outputs\pdm2pcm_output.wav'  # relative path to input.wav
+buffer_size = 10000  
+overlap = 0.5  # Overlap between segments in processing, as a percentage of the buffer
+output_path = 'outputs\dcr_output.wav'  # path to where the output will be saved
+
+
+# Voice Activity Detector
+[VAD]
+input_path = 'outputs\dcr_output.wav'  # relative path to input.wav
+time_frame = 0.02  # Parameter chosen according to article 20ms
+time_step = 0.01  # Parameter chosen according to article 10ms
+output_path = 'outputs\vad_output.wav'  # path to where the output will be saved
+
+
+# Acoustic Gain Control 
+[AGC]
+input_path = 'outputs\vad_output.wav'  # relative path to input.wav
+gain = 10  # gain level in dB. Default: 10
+buffer_size = 1024  
+output_path = 'outputs\agc_output.wav'  # path to where the output will be saved
+
+
+# Analysis & synthesis of Short Time Fourier Transform
+[STFT]
+input_path = 'outputs\agc_output.wav'  # relative path to input.wav
+segment_start_time = 4  # starting point of the sample
+segment_length_time = 2  # sample lenght
+output_path = 'outputs\stft_output.wav'  # path to where the output will be saved
+
+
+# Noise Reduction
+[Noise_Reduction]  
+input_path = 'outputs\stft_output.wav'    # relative path to input.wav
+noise_reduction_factor = 0.5  #
+fft_size = 4096  # determines size of FFT window
+hop_length = 1024  # specifies number of samples between successive frames
+output_path = 'outputs\NoiseReduction_output.wav'  # path to where the output will be saved
+
+
+# Pitch Estimation
+[Pitch_Estimation]   
+input_path = 'outputs\NoiseReduction_output.wav'  # relative path to input.wav
+output_path = 'outputs\pitch_estimation_output.wav'  # path to where the output will be saved
+
+
+# Slowing down or speeding up speech - Audio Speed Modification
+[ASM]
+input_path = 'outputs\pitch_estimation_output.wav'    # relative path to input.wav
+speed_factor = 2  # has to be in range of 0<=speed_factor<=2
+output_path = 'outputs\asm_output.wav'  # relative path to output
+
+
+# Decimation & interpolation
+[Decimation_Interpolation]  
+input_path = 'outputs\asm_output.wav'  # relative path to input.wav
+decimation_factor = 4  # determines the factor by which the sampling rate is reduced
+FOH = true
+SHANON = false
+# ZOH = false
+# only one of them should be true. it controls what Interpolation will be used
+# sends to ZOH if FOH,SHANON = false
+interpolation_factor = 4  # factor by which the sampling rate is increased
+output_decimation_path = 'outputs\Decimation_output.wav'  # path to where the output will be saved
+output_interpolation_path = 'outputs\Interpolation_output.wav'  # path to where the output will be saved
+
+
+#
+[SSB]  
+input_path = 'outputs\Interpolation_output.wav'   # relative path to input.wav
+fc = 50e3  # Carrier frequency in Hz
+fs = 350e3  # Sampling frequency in Hz
+## fsaudio = 44100  # Audio sampling frequency # might be usless
+output_path = 'outputs\ssb_output.wav'  # path to where the output will be saved
+
